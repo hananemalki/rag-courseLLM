@@ -1,0 +1,28 @@
+# Spring Boot
+target/
+*.log
+*.class
+
+# React
+node_modules/
+dist/
+build/
+
+# IDEs
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+.classpath
+.project
+.settings/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment variables
+.env
+.env.local
+.env.production

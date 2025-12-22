@@ -1,0 +1,82 @@
+version: '3.8'
+
+services:
+  # ChromaDB - Vector Database
+  chromadb:
+    image: chromadb/chroma:latest
+    container_name: rag-chromadb
+    ports:
+      - "8000:8000"
+    volumes:
+      - chromadb-data:/chroma/chroma
+    environment:
+      - ANONYMIZED_TELEMETRY=False
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/heartbeat"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - rag-network
+    restart: unless-stopped
+
+  # Ollama - LLM Service
+  ollama:
+    image: ollama/ollama:latest
+    container_name: rag-ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama-data:/root/.ollama
+    environment:
+      - OLLAMA_HOST=0.0.0.0
+    healthcheck:
+      test: ["CMD", "ollama", "list"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - rag-network
+    restart: unless-stopped
+
+  # RAG Backend Application
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: rag-backend
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./documents:/app/documents
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - OLLAMA_BASE_URL=http://ollama:11434
+      - CHROMA_DB_URL=http://chromadb:8000
+      - CORS_ALLOWED_ORIGINS=http://localhost:3000,http://localhost:5173
+    depends_on:
+      chromadb:
+        condition: service_healthy
+      ollama:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/api/chat/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    networks:
+      - rag-network
+    restart: unless-stopped
+
+# Volumes for persistent data
+volumes:
+  chromadb-data:
+    driver: local
+  ollama-data:
+    driver: local
+
+# Network
+networks:
+  rag-network:
+    driver: bridge

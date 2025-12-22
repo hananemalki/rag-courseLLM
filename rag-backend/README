@@ -1,0 +1,258 @@
+#  RAG Backend - Intelligent Q&A System - Hanane Malki 
+
+Java Spring Boot backend for a RAG (Retrieval-Augmented Generation) system that allows asking questions about PDF documents and getting contextual AI-powered answers.
+
+##  Table of Contents
+
+- [Features](#features)
+- [Architecture](#architecture)
+- [Prerequisites](#prerequisites)
+- [Installation](#installation)
+- [Configuration](#configuration)
+- [API Endpoints](#api-endpoints)
+- [Usage](#usage)
+- [Technologies](#technologies)
+
+##  Features
+
+-  **PDF document upload** with automatic indexing
+-  **Semantic search** across indexed documents
+-  **Intelligent Q&A** based on PDF content
+-  **ChromaDB vector database** for embeddings storage
+-  **Ollama LLM models** for answer generation
+-  **Document management** (list, check, re-indexing)
+-  **Complete REST API** with CORS configured
+
+##  Architecture
+
+The system uses a RAG (Retrieval-Augmented Generation) architecture:
+
+```
+PDF Documents → Segmentation → Embeddings → ChromaDB
+                                                ↓
+User Question → Embeddings → Semantic Search → Context
+                                                  ↓
+                                            LLM (Ollama) → Answer
+```
+
+### Project Structure
+
+```
+org.mql.ai/
+├── business/           # Business services
+│   ├── EmbeddingService
+│   ├── PDFLoaderService
+│   └── RagService
+├── config/            # Spring configuration
+│   ├── CorsConfig
+│   └── LangChainConfig
+├── controllers/       # REST API
+│   ├── ChatController
+│   └── PDFController
+├── exceptions/        # Error handling
+│   ├── PDFLoadException
+│   └── RAGException
+└── models/           # Data models
+    ├── ChatRequest
+    ├── ChatResponse
+    └── DocumentMetadata
+```
+
+##  Prerequisites
+
+### Required Software
+
+- **Java 17+** (JDK)
+- **Maven 3.8+**
+- **Docker** (for ChromaDB)
+- **Ollama** with the following models:
+  - `llama3.2` (or your preferred chat model)
+  - `nomic-embed-text` (for embeddings)
+
+### Installing Ollama
+
+```bash
+# Linux/Mac
+curl -fsSL https://ollama.com/install.sh | sh
+
+# Download models
+ollama pull llama3.2
+ollama pull nomic-embed-text
+```
+
+### Installing ChromaDB
+
+```bash
+# With Docker
+docker run -d \
+  --name chromadb \
+  -p 8000:8000 \
+  chromadb/chroma:latest
+
+# Verify ChromaDB is running
+curl http://localhost:8000/api/v1/heartbeat
+```
+
+##  Installation
+
+### 1. Clone the project
+
+```bash
+git clone <your-repo>
+cd rag-backend
+```
+
+### 2. Configure application.properties
+
+
+```properties
+# Server configuration
+# Ollama configuration
+# ChromaDB configuration
+# RAG configuration
+# CORS configuration
+```
+
+### 3. Run
+
+mvn spring-boot:run
+```
+
+The application will be accessible at `http://localhost:8080`
+
+##  API Endpoints
+
+### Chat & Questions
+
+#### Ask a question
+```http
+POST /api/chat/ask
+Content-Type: application/json
+
+{
+  "question": "What is RAG?",
+  "maxResults": 5
+}
+```
+
+#### Index all documents
+```http
+POST /api/documents/index-all
+```
+
+#### List documents
+```http
+GET /api/documents/list
+```
+
+#### List indexed documents
+```http
+GET /api/documents/indexed
+```
+
+#### Check if document is indexed
+```http
+GET /api/documents/check/{filename}
+```
+
+#### Force re-indexing
+```http
+POST /api/documents/force-reindex
+```
+
+#### Clear index
+```http
+DELETE /api/documents/clear?confirm=true
+```
+
+##   Usage
+
+### Example with cURL
+
+```bash
+# 1. Upload a document
+curl -X POST http://localhost:8080/api/documents/upload \
+  -F "file=@my-document.pdf"
+
+# 2. Ask a question
+curl -X POST http://localhost:8080/api/chat/ask \
+  -H "Content-Type: application/json" \
+  -d '{"question": "What is the main topic of the document?"}'
+
+# 3. List indexed documents
+curl http://localhost:8080/api/documents/indexed
+```
+
+
+##  Technologies
+
+- **Spring Boot 3.x** - Backend framework
+- **LangChain4j** - RAG framework for Java
+- **Ollama** - Local LLM models
+- **ChromaDB** - Vector database
+- **Apache PDFBox** - PDF text extraction
+- **SLF4J/Logback** - Logging
+
+##  Main Maven Dependencies
+
+```xml
+<dependencies>
+    <!-- Spring Boot -->
+    <!-- LangChain4j -->
+    <!-- PDF Processing -->
+</dependencies>
+```
+
+##  Troubleshooting
+
+### ChromaDB not responding
+```bash
+# Check if container is running
+docker ps | grep chromadb
+
+# Restart ChromaDB
+docker restart chromadb
+```
+
+### Ollama not responding
+```bash
+# Check service
+ollama list
+
+# Start Ollama
+ollama serve
+```
+
+##  Deployment
+
+### Docker Deployment
+
+Create a `Dockerfile`:
+
+```dockerfile
+FROM openjdk:17-jdk-slim
+WORKDIR /app
+COPY target/rag-backend.jar app.jar
+EXPOSE 8080
+ENTRYPOINT ["java", "-jar", "app.jar"]
+```
+
+Build and run:
+
+```bash
+mvn clean package
+docker build -t rag-backend .
+docker run -p 8080:8080 rag-backend
+```
+
+
+##  Author
+
+**Hanane Malki**  
+Project developed as part of the Generative AI module
+
+
+**Note**: Ensure Ollama and ChromaDB are running before starting the application.
+
+
+
