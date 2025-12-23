@@ -71,16 +71,14 @@ public class LangChainConfig {
         logger.info(" Collection: {}", chromaDbCollection);
         
         try {
-            // Vérifier d'abord si ChromaDB est accessible
             logger.info(" Vérification de la connexion à ChromaDB...");
             
-            // Pour ChromaDB >= 0.5.0 (API v2), utiliser cette configuration
             ChromaEmbeddingStore store = ChromaEmbeddingStore.builder()
                 .baseUrl(chromaDbUrl)
                 .collectionName(chromaDbCollection)
                 .timeout(Duration.ofSeconds(30))
-                .logRequests(true)  // Pour déboguer
-                .logResponses(true) // Pour déboguer
+                .logRequests(true)  
+                .logResponses(true) 
                 .build();
             
             logger.info(" ChromaDB connecté avec succès (API v2) !");
@@ -91,7 +89,6 @@ public class LangChainConfig {
             logger.error(" ChromaDB nécessite l'API v2");
             logger.error(" Vérifiez que ChromaDB est démarré: docker ps | grep chromadb");
             
-            // Si l'erreur est liée à l'API v1/v2, suggérer une solution
             if (e.getMessage() != null && e.getMessage().contains("405")) {
                 logger.error(" SOLUTION: Utilisez une version compatible de LangChain4j");
                 logger.error(" Ou redémarrez ChromaDB avec: docker restart chromadb");
