@@ -173,9 +173,8 @@ public class RAGServiceDefault implements RagService {
     }
 
 
-    /**
-     * Détermine la langue de la question
-     */
+    
+    // Détermine la langue de la question
     private String determineLanguage(ChatRequest request) {
         if (request.getLanguage() != null) {
             return request.getLanguage().toLowerCase();
@@ -203,28 +202,24 @@ public class RAGServiceDefault implements RagService {
         return englishCount > frenchCount ? "en" : "fr";
     }
 
-    /**
-     * Construit le contexte à partir des segments trouvés
-     */
+    
+    // Construit le contexte à partir des segments trouvés
     private String buildContext(List<EmbeddingMatch<TextSegment>> matches) {
         return matches.stream()
             .map(match -> match.embedded().text())
             .collect(Collectors.joining("\n\n---\n\n"));
     }
 
-    /**
-     * Construit le prompt pour le LLM selon la langue
-     */
+    
+    // Construit le prompt pour le LLM selon la langue
     private String buildPrompt(String question, String context, String language) {
         String template = language.equals("en") ? promptTemplateEn : promptTemplateFr;
         return String.format(template, context, question);
     }
 
-    /**
-     * Garde le meilleur score par document
-     */
+    
+    // Garde le meilleur score par document
     private List<SourceInfo> buildSourcesDeduplicated(List<EmbeddingMatch<TextSegment>> matches) {
-        // Map pour stocker le meilleur match par fichier
         Map<String, EmbeddingMatch<TextSegment>> bestMatchByFile = new LinkedHashMap<>();
         
         for (EmbeddingMatch<TextSegment> match : matches) {
@@ -235,14 +230,11 @@ public class RAGServiceDefault implements RagService {
                 fileName = "Document inconnu";
             }
             
-            // Garder le match avec le meilleur score pour ce fichier
             EmbeddingMatch<TextSegment> existingMatch = bestMatchByFile.get(fileName);
             if (existingMatch == null || match.score() > existingMatch.score()) {
                 bestMatchByFile.put(fileName, match);
             }
         }
-        
-        // Convertir en SourceInfo
         List<SourceInfo> sources = new ArrayList<>();
         for (Map.Entry<String, EmbeddingMatch<TextSegment>> entry : bestMatchByFile.entrySet()) {
             String fileName = entry.getKey();
@@ -257,7 +249,6 @@ public class RAGServiceDefault implements RagService {
             sources.add(source);
         }
         
-        // Trier par score décroissant
         sources.sort((s1, s2) -> Double.compare(s2.getRelevanceScore(), s1.getRelevanceScore()));
         
         return sources;

@@ -58,9 +58,8 @@ public class PDFLoaderServiceDefault implements PDFLoaderService {
         logger.info(" Taille des chunks: {} (overlap: {})", chunkSize, chunkOverlap);
     }
     
-    /**
-     * Détecte les PDFs et indexe ceux qui ne sont pas dans ChromaDB
-     */
+    
+    // Détecte les PDFs et indexe ceux qui ne sont pas dans ChromaDB
     @PostConstruct
     public void initializeIndex() {
         logger.info(" Initialisation de l'index au démarrage...");
@@ -68,7 +67,6 @@ public class PDFLoaderServiceDefault implements PDFLoaderService {
         try {
             Path coursesPath = Paths.get(coursesDirectory);
             
-            // Créer le répertoire s'il n'existe pas
             if (!Files.exists(coursesPath)) {
                 logger.warn(" Répertoire non trouvé, création: {}", coursesDirectory);
                 Files.createDirectories(coursesPath);
@@ -76,7 +74,6 @@ public class PDFLoaderServiceDefault implements PDFLoaderService {
                 return;
             }
             
-            // Scanner les fichiers PDF
             List<Path> pdfFiles = Files.list(coursesPath)
                 .filter(path -> path.toString().toLowerCase().endsWith(".pdf"))
                 .collect(Collectors.toList());
@@ -88,7 +85,6 @@ public class PDFLoaderServiceDefault implements PDFLoaderService {
                 return;
             }
             
-            // Vérifier quels fichiers sont déjà dans ChromaDB
             int alreadyIndexed = 0;
             int newlyIndexed = 0;
             
@@ -96,11 +92,9 @@ public class PDFLoaderServiceDefault implements PDFLoaderService {
                 String fileName = pdfPath.getFileName().toString();
                 
                 if (isReallyIndexedInChroma(fileName)) {
-                    // Déjà indexé dans ChromaDB
                     alreadyIndexed++;
                     indexedFiles.add(fileName);
                     
-                    // Créer les métadonnées depuis ChromaDB
                     try {
                         long fileSize = Files.size(pdfPath);
                         int chunkCount = getChunkCountFromChroma(fileName);
@@ -118,7 +112,6 @@ public class PDFLoaderServiceDefault implements PDFLoaderService {
                         logger.warn(" Impossible de lire les métadonnées de: {}", fileName);
                     }
                 } else {
-                    // Pas encore indexé - indexer maintenant
                     logger.info(" Indexation de: {}", fileName);
                     DocumentMetadata metadata = loadPDF(pdfPath);
                     if (metadata != null) {
@@ -137,24 +130,21 @@ public class PDFLoaderServiceDefault implements PDFLoaderService {
         }
     }
     
-    /**
-     *  Vérifie si un document est vraiment dans ChromaDB
-     */
+    
+    //  Vérifie si un document est vraiment dans ChromaDB
     private boolean isReallyIndexedInChroma(String fileName) {
         try {
-            // Créer un embedding de test
             Embedding testEmbedding = embeddingService.embedText("test");
             
-            // Chercher des segments de ce fichier spécifique
             EmbeddingSearchRequest request = EmbeddingSearchRequest.builder()
                 .queryEmbedding(testEmbedding)
-                .maxResults(50) // Chercher plus pour être sûr
-                .minScore(0.0) // Pas de filtre de score
+                .maxResults(50) 
+                .minScore(0.0) 
                 .build();
             
             EmbeddingSearchResult<TextSegment> result = embeddingStore.search(request);
             
-            // Vérifier si au moins un segment de ce fichier existe
+            
             boolean found = result.matches().stream()
                 .anyMatch(match -> {
                     String segmentFileName = match.embedded().metadata().getString("file_name");
@@ -169,16 +159,15 @@ public class PDFLoaderServiceDefault implements PDFLoaderService {
         }
     }
     
-    /**
-     *  Compte le nombre de chunks d'un fichier dans ChromaDB
-     */
+    
+    // Compte le nombre de chunks d'un fichier dans ChromaDB
     private int getChunkCountFromChroma(String fileName) {
         try {
             Embedding testEmbedding = embeddingService.embedText("test");
             
             EmbeddingSearchRequest request = EmbeddingSearchRequest.builder()
                 .queryEmbedding(testEmbedding)
-                .maxResults(1000) // Chercher beaucoup pour compter tous les chunks
+                .maxResults(1000) 
                 .minScore(0.0)
                 .build();
             
@@ -247,7 +236,6 @@ public class PDFLoaderServiceDefault implements PDFLoaderService {
             Document document = parser.parse(new ByteArrayInputStream(fileContent));
             logger.debug(" Document parsé avec succès");
            
-            // Découper en chunks
             DocumentSplitter splitter = DocumentSplitters.recursive(
                 chunkSize, 
                 chunkOverlap

@@ -1,19 +1,13 @@
 package org.mql.ai.controllers;
 
-import org.mql.ai.business.PDFLoaderService;
 import org.mql.ai.business.RagService;
 import org.mql.ai.models.ChatRequest;
 import org.mql.ai.models.ChatResponse;
-import org.mql.ai.models.DocumentMetadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.util.List;
 import java.util.Map;
 
 
@@ -31,7 +25,6 @@ public class ChatController {
 
     
      // POST /api/chat/ask
-
     @PostMapping("/ask")
     public ResponseEntity<ChatResponse> askQuestion(@RequestBody ChatRequest request) {
         logger.info(" Question reçue: {}", request.getQuestion());
@@ -54,8 +47,7 @@ public class ChatController {
     }
 
     
-    // Health check
-     
+    // juste pour vérification de fonctionnement
     @GetMapping("/health")
     public ResponseEntity<Map<String, String>> health() {
         return ResponseEntity.ok(Map.of(
@@ -66,7 +58,6 @@ public class ChatController {
 
     
     // Obtenir le nombre de documents indexés
-     
     @GetMapping("/stats")
     public ResponseEntity<Map<String, Object>> getStats() {
         int count = ragService.getIndexedDocumentsCount();
