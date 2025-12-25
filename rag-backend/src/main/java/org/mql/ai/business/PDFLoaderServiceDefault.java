@@ -131,7 +131,7 @@ public class PDFLoaderServiceDefault implements PDFLoaderService {
     }
     
     
-    //  Vérifie si un document est vraiment dans ChromaDB
+    // vérifie si un document est vraiment dans ChromaDB
     private boolean isReallyIndexedInChroma(String fileName) {
         try {
             Embedding testEmbedding = embeddingService.embedText("test");

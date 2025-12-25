@@ -3,7 +3,6 @@ package org.mql.ai.models;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class ChatRequest {
-    
     private String question;
     
     @JsonProperty("include_sources")

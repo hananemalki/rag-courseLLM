@@ -174,7 +174,7 @@ public class RAGServiceDefault implements RagService {
 
 
     
-    // Détermine la langue de la question
+    // détermine la langue de la question
     private String determineLanguage(ChatRequest request) {
         if (request.getLanguage() != null) {
             return request.getLanguage().toLowerCase();
@@ -203,7 +203,7 @@ public class RAGServiceDefault implements RagService {
     }
 
     
-    // Construit le contexte à partir des segments trouvés
+    // construit le contexte à partir des segments trouvés
     private String buildContext(List<EmbeddingMatch<TextSegment>> matches) {
         return matches.stream()
             .map(match -> match.embedded().text())
@@ -211,14 +211,14 @@ public class RAGServiceDefault implements RagService {
     }
 
     
-    // Construit le prompt pour le LLM selon la langue
+    // construit le prompt pour le LLM selon la langue
     private String buildPrompt(String question, String context, String language) {
         String template = language.equals("en") ? promptTemplateEn : promptTemplateFr;
         return String.format(template, context, question);
     }
 
     
-    // Garde le meilleur score par document
+    // garde le meilleur score par document
     private List<SourceInfo> buildSourcesDeduplicated(List<EmbeddingMatch<TextSegment>> matches) {
         Map<String, EmbeddingMatch<TextSegment>> bestMatchByFile = new LinkedHashMap<>();
         
@@ -250,7 +250,6 @@ public class RAGServiceDefault implements RagService {
         }
         
         sources.sort((s1, s2) -> Double.compare(s2.getRelevanceScore(), s1.getRelevanceScore()));
-        
         return sources;
     }
 }

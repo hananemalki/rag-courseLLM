@@ -3,7 +3,6 @@ package org.mql.ai.models;
 import java.time.LocalDateTime;
 
 public class DocumentMetadata {
-    
     private String id;
     private String fileName;
     private String filePath;
@@ -20,9 +19,7 @@ public class DocumentMetadata {
         this.filePath = filePath;
         this.indexed = false;
     }
-    
-    // Getters et Setters
-    
+        
     public String getId() {
         return id;
     }

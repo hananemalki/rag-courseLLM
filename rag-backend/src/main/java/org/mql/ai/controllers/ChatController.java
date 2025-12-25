@@ -24,7 +24,7 @@ public class ChatController {
     }
 
     
-     // POST /api/chat/ask
+     // /api/chat/ask
     @PostMapping("/ask")
     public ResponseEntity<ChatResponse> askQuestion(@RequestBody ChatRequest request) {
         logger.info(" Question reçue: {}", request.getQuestion());
@@ -57,7 +57,7 @@ public class ChatController {
     }
 
     
-    // Obtenir le nombre de documents indexés
+    // obtenir le nombre de documents indexés
     @GetMapping("/stats")
     public ResponseEntity<Map<String, Object>> getStats() {
         int count = ragService.getIndexedDocumentsCount();

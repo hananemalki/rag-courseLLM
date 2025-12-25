@@ -38,7 +38,7 @@ class PDFController {
 
     /**
      * Upload et indexation d'un nouveau PDF
-     * POST /api/documents/upload
+     *  /api/documents/upload
      */
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> uploadPDF(@RequestParam("file") MultipartFile file) {
@@ -73,7 +73,7 @@ class PDFController {
 
     /**
      * Indexer tous les PDFs du répertoire
-     * POST /api/documents/index-all
+     *  /api/documents/index-all
      */
     
     @PostMapping("/index-all")
@@ -93,7 +93,7 @@ class PDFController {
 
     /**
      * Vérifier si un document est indexé
-     * GET /api/documents/check/{filename}
+     *  /api/documents/check/{filename}
      */
     @GetMapping("/check/{filename}")
     public ResponseEntity<Map<String, Boolean>> checkIndexed(@PathVariable String filename) {
@@ -103,7 +103,7 @@ class PDFController {
 
     /**
      * Supprimer l'index complet (avec confirmation)
-     * DELETE /api/documents/clear
+     * /api/documents/clear
      */
     @DeleteMapping("/clear")
     public ResponseEntity<Map<String, String>> clearIndex(
@@ -124,7 +124,7 @@ class PDFController {
 
     /**
      * Lister tous les documents
-     * GET /api/documents/list
+     *  /api/documents/list
      */
     @GetMapping("/list")
     public ResponseEntity<List<DocumentMetadata>> listDocuments() {
@@ -141,7 +141,7 @@ class PDFController {
     
     /**
      * Force la ré-indexation même si déjà indexé
-     * POST /api/documents/force-reindex
+     *  /api/documents/force-reindex
      */
     @PostMapping("/force-reindex")
     public ResponseEntity<Map<String, Object>> forceReindex() {
